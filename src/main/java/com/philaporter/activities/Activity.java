@@ -18,7 +18,7 @@ public class Activity {
     uuid = UUID.randomUUID().toString();
     instant = Instant.now();
 
-    System.out.println("Activity started at " + instant);
+    //    System.out.println("Activity started at " + instant);
 
     int i = new Random().nextInt(6) + 1;
     // Create a random failure
