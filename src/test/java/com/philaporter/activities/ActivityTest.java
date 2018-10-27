@@ -12,56 +12,48 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 @RunWith(VertxUnitRunner.class)
 public class ActivityTest {
 
   @ClassRule public static RunTestOnContext rule = new RunTestOnContext();
-  private static final Logger LOGGER = Logger.getLogger(ActivityTest.class.getName());
 
   // BASIC COMPOSITE FUTURE
   @Test
   public void thing(TestContext context) {
     Async async = context.async();
-    Future firstFuture = Future.future();
-    Future secondFuture = Future.future();
+    ArrayList<Future> futureList = new ArrayList<>(6);
+    JsonObject jsonObject = new JsonObject();
+    int size = 6;
 
-    ArrayList<JsonObject> list = new ArrayList<>();
+    // Create futures to attach to activities
+    for (int i = 0; i < size; i++) {
+      futureList.add(Future.future());
+    }
 
-    rule.vertx()
-        .setTimer(
-            2000,
-            delayedAction -> {
-              list.add(new Activity().activate(firstFuture));
-            });
+    // Fire off the activities and pass them the futures
+    for (int i = 0; i < size; i++) {
+      new Activity().activate(futureList.get(i), jsonObject);
+    }
 
-    rule.vertx()
-        .setTimer(
-            5000,
-            delayedAction -> {
-              list.add(new Activity().activate(secondFuture));
-            });
-
-    CompositeFuture.all(firstFuture, secondFuture)
+    // Setup handler for watching the futures
+    CompositeFuture.join(futureList)
         .setHandler(
-            ar -> {
-              if (ar.succeeded()) {
+            handler -> {
+              if (handler.succeeded()) {
+                // TODO: Create a success path to trigger here
+                System.out.println("All activities successfully succeeded");
               } else {
-                LOGGER.severe("FAILURE");
-                async.complete();
+                // TODO: Create a failure path to trigger here
+                System.out.println("At least one activity failed");
               }
             });
 
     rule.vertx()
         .setTimer(
-            8000,
-            hkhj -> {
-              System.out.println(list.size());
-              list.forEach(
-                  v -> {
-                    LOGGER.info(v.encodePrettily());
-                  });
+            1,
+            delayedAction -> {
+              System.out.println(jsonObject.encodePrettily());
               async.complete();
             });
   }

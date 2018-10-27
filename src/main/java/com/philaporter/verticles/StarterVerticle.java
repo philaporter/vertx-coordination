@@ -6,13 +6,10 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import static com.philaporter.util.Constants.ACTIVITY_LOCATION;
 
 public class StarterVerticle extends AbstractVerticle {
-
-  private static final Logger LOGGER = Logger.getLogger(StarterVerticle.class.getName());
 
   @Override
   public void start(Future startFuture) {
@@ -30,10 +27,10 @@ public class StarterVerticle extends AbstractVerticle {
                       new JsonObject()
                           .put(UUID.class.getSimpleName(), UUID.randomUUID().toString()),
                       messageAsyncResult -> {
-                        LOGGER.info(messageAsyncResult.result().body().toString());
+                        System.out.println(messageAsyncResult.result().body().toString());
                       });
             });
     startFuture.complete();
-    LOGGER.info("Deployed " + this.getClass().getName() + " successfully");
+    System.out.println("Deployed " + this.getClass().getName() + " successfully");
   }
 }
